@@ -1,0 +1,11 @@
+/vendor/
+.env
+.phpunit.result.cache
+Homestead.json
+Homestead.yaml
+npm-debug.log
+yarn-error.log
+auth.json
+.vscode/
+.idea/
+composer.lock

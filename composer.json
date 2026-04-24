@@ -1,0 +1,30 @@
+{
+    "name": "fraudhunter/laravel-sdk",
+    "description": "FraudHunter SDK for Laravel applications",
+    "type": "library",
+    "keywords": ["laravel", "fraud", "detection", "fraudhunter"],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "FraudHunter Team",
+            "email": "support@fraudhunter.io"
+        }
+    ],
+    "require": {
+        "php": ">=5.6.0",
+        "illuminate/support": "^5.0|^6.0|^7.0|^8.0|^9.0|^10.0|^11.0",
+        "guzzlehttp/guzzle": "^6.0|^7.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "FraudHunter\\Laravel\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "FraudHunter\\Laravel\\FraudHunterServiceProvider"
+            ]
+        }
+    }
+}
