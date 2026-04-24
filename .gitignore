@@ -9,3 +9,4 @@ auth.json
 .vscode/
 .idea/
 composer.lock
+composer
