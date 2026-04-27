@@ -2,12 +2,12 @@
     "name": "fraudhunter/laravel-sdk",
     "description": "FraudHunter SDK for Laravel applications",
     "type": "library",
-    "keywords": ["laravel", "fraud", "detection", "fraudhunter"],
+    "keywords": ["fraud", "detection", "fraudhunter"],
     "license": "MIT",
     "authors": [
         {
             "name": "FraudHunter Team",
-            "email": "support@fraudhunter.io"
+            "email": "security@mobilepulsa.com"
         }
     ],
     "require": {
