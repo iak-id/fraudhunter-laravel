@@ -71,12 +71,24 @@ class FraudHunterListener
         }
 
         if ($source) {
-            $data['amount'] = $this->extract($source, ['amount', 'total', 'value']);
-            $data['currency'] = $this->extract($source, ['currency', 'currency_code'], 'IDR');
-            $data['ref_id'] = $this->extract($source, ['ref_id', 'reference', 'order_id', 'id']);
+            $data['amount']               = $this->extract($source, ['amount', 'total', 'value']);
+            $data['currency']             = $this->extract($source, ['currency', 'currency_code'], 'IDR');
+            $data['ref_id']               = $this->extract($source, ['ref_id', 'reference', 'order_id', 'id']);
             $data['recipient_account_id'] = $this->extract($source, ['recipient_account_id', 'to_account', 'destination']);
-            $data['transaction_type'] = $this->extract($source, ['transaction_type', 'type'], 'Transfer');
-            $data['merchant'] = $this->extract($source, ['merchant', 'provider', 'vendor'], config('fraudhunter.service'));
+            $data['transaction_type']     = $this->extract($source, ['transaction_type', 'type'], 'Transfer');
+            $data['platform']             = $this->extract($source, ['platform', 'merchant', 'provider', 'vendor'], config('fraudhunter.platform', ''));
+
+            // Destination number (e.g. phone/account number for top-up or transfer)
+            $destinationNumber = $this->extract($source, ['destination_number', 'phone_number', 'msisdn', 'destination', 'to_number']);
+            if ($destinationNumber !== null) {
+                $data['destination_number'] = (string) $destinationNumber;
+            }
+
+            // Product code (e.g. SKU, voucher code, top-up product)
+            $productCode = $this->extract($source, ['product_code', 'sku', 'product_id', 'item_code', 'voucher_code']);
+            if ($productCode !== null) {
+                $data['product_code'] = (string) $productCode;
+            }
         }
 
         if (isset($data['account_id']) && isset($data['amount'])) {
@@ -99,11 +111,26 @@ class FraudHunterListener
             'device_id'  => Request::header('X-Device-ID') ?: session()->getId(),
         ];
 
-        // Extract Account ID
+        // Extract User ID and Account ID
         if (isset($event->user) && isset($event->user->id)) {
-            $data['account_id'] = (string)$event->user->id;
+            $data['user_id']    = (string) $event->user->id;
+            $data['account_id'] = (string) $event->user->id;
         } elseif (auth()->check()) {
-            $data['account_id'] = (string)auth()->id();
+            $data['user_id']    = (string) auth()->id();
+            $data['account_id'] = (string) auth()->id();
+        }
+
+        // Extract Tenant ID (multi-tenant support)
+        if (isset($event->user)) {
+            $tenantId = $this->extract($event->user, ['tenant_id', 'organisation_id', 'company_id']);
+            if ($tenantId !== null) {
+                $data['tenant_id'] = (string) $tenantId;
+            }
+        } elseif (auth()->check()) {
+            $tenantId = $this->extract(auth()->user(), ['tenant_id', 'organisation_id', 'company_id']);
+            if ($tenantId !== null) {
+                $data['tenant_id'] = (string) $tenantId;
+            }
         }
 
         return $data;

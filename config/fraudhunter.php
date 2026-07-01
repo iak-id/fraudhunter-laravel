@@ -23,13 +23,14 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Service Name
+    | Platform Name
     |--------------------------------------------------------------------------
     |
-    | Identifying the service sending the data (e.g., 'WL', 'IAK', 'Buylink').
+    | Identifying the platform sending the data (e.g., 'WL', 'IAK', 'Buylink').
+    | Required — must be set via FRAUDHUNTER_PLATFORM in your .env file.
     |
     */
-    'service' => env('FRAUDHUNTER_SERVICE', 'WL'),
+    'platform' => env('FRAUDHUNTER_PLATFORM', ''),
 
     /*
     |--------------------------------------------------------------------------

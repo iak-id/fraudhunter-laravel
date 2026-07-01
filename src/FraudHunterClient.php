@@ -52,9 +52,9 @@ class FraudHunterClient
      */
     public function logActivity(array $data)
     {
-        // Ensure service is set from config if not provided
-        if (!isset($data['service'])) {
-            $data['service'] = $this->config['service'];
+        // Ensure platform is set from config if not provided
+        if (!isset($data['platform'])) {
+            $data['platform'] = $this->config['platform'] ?? '';
         }
 
         return $this->post('/api/v1/activities', $data);
