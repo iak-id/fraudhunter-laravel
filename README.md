@@ -36,7 +36,7 @@ php artisan vendor:publish --provider="FraudHunter\Laravel\FraudHunterServicePro
 ```env
 FRAUDHUNTER_API_URL=http://your-fraudhunter-server:8080
 FRAUDHUNTER_API_KEY=fh_live_xxxxxxxxxxxx
-FRAUDHUNTER_SERVICE=WL
+FRAUDHUNTER_PLATFORM=WL
 ```
 
 ## Penggunaan
@@ -58,12 +58,17 @@ use FraudHunter\Laravel\FraudHunterClient;
 public function processPayment(FraudHunterClient $fraudHunter)
 {
     $result = $fraudHunter->analyzeTransaction([
-        'account_id'    => 'ACC001',
-        'amount'        => 5000000,
-        'currency'      => 'IDR',
-        'type'          => 'PAYMENT',
-        'ip_address'    => request()->ip(),
-        'device_id'     => 'DEV-123',
+        'account_id'         => 'ACC001',
+        'user_id'            => '123',
+        'tenant_id'          => 'TENANT_A',
+        'amount'             => 5000000,
+        'currency'           => 'IDR',
+        'transaction_type'   => 'PAYMENT',
+        'platform'           => 'WL',
+        'ip_address'         => request()->ip(),
+        'device_id'          => 'DEV-123',
+        'destination_number' => '08123456789',  // opsional: nomor tujuan
+        'product_code'       => 'PULSA-10K',    // opsional: kode produk
     ]);
 
     if ($result['recommended_action'] === 'REJECT') {
@@ -78,6 +83,9 @@ public function processPayment(FraudHunterClient $fraudHunter)
 ```php
 $fraudHunter->logActivity([
     'account_id'    => 'ACC001',
+    'user_id'       => '123',
+    'tenant_id'     => 'TENANT_A',
+    'platform'      => 'WL',
     'activity_type' => 'UPDATE_PROFILE',
     'status'        => 'SUCCESS',
 ]);
