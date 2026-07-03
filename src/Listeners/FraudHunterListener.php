@@ -120,16 +120,24 @@ class FraudHunterListener
             $data['account_id'] = (string) auth()->id();
         }
 
-        // Extract Tenant ID (multi-tenant support)
+        // Extract Tenant ID & Name (multi-tenant support)
         if (isset($event->user)) {
             $tenantId = $this->extract($event->user, ['tenant_id', 'organisation_id', 'company_id']);
             if ($tenantId !== null) {
                 $data['tenant_id'] = (string) $tenantId;
             }
+            $tenantName = $this->extract($event->user, ['tenant_name', 'organisation_name', 'company_name', 'name']);
+            if ($tenantName !== null) {
+                $data['tenant_name'] = (string) $tenantName;
+            }
         } elseif (auth()->check()) {
             $tenantId = $this->extract(auth()->user(), ['tenant_id', 'organisation_id', 'company_id']);
             if ($tenantId !== null) {
                 $data['tenant_id'] = (string) $tenantId;
+            }
+            $tenantName = $this->extract(auth()->user(), ['tenant_name', 'organisation_name', 'company_name', 'name']);
+            if ($tenantName !== null) {
+                $data['tenant_name'] = (string) $tenantName;
             }
         }
 
