@@ -89,6 +89,40 @@ class FraudHunterListener
             if ($productCode !== null) {
                 $data['product_code'] = (string) $productCode;
             }
+
+            // User deposit — synced to Account.Balance in FraudHunter
+            $userDeposit = $this->extract($source, ['user_deposit', 'deposit', 'balance', 'wallet_balance']);
+            if ($userDeposit !== null && $userDeposit > 0) {
+                $data['user_deposit'] = (float) $userDeposit;
+            }
+        }
+
+        // User profile metadata from the event user object (for account enrichment)
+        $userSource = $event->user ?? (auth()->check() ? auth()->user() : null);
+        if ($userSource) {
+            // user_created_at: when the user registered on the external platform
+            $createdAt = $this->extract($userSource, ['created_at', 'registered_at', 'joined_at']);
+            if ($createdAt !== null) {
+                $data['user_created_at'] = is_string($createdAt)
+                    ? $createdAt
+                    : (method_exists($createdAt, 'toIso8601String') ? $createdAt->toIso8601String() : (string) $createdAt);
+            }
+
+            // user_lastlogin: last login timestamp on the external platform
+            $lastLogin = $this->extract($userSource, ['last_login_at', 'last_login', 'lastlogin', 'last_seen_at']);
+            if ($lastLogin !== null) {
+                $data['user_lastlogin'] = is_string($lastLogin)
+                    ? $lastLogin
+                    : (method_exists($lastLogin, 'toIso8601String') ? $lastLogin->toIso8601String() : (string) $lastLogin);
+            }
+
+            // user_deposit from user object (fallback if not set from transaction source)
+            if (!isset($data['user_deposit'])) {
+                $userDeposit = $this->extract($userSource, ['user_deposit', 'deposit', 'balance', 'wallet_balance', 'saldo']);
+                if ($userDeposit !== null && $userDeposit > 0) {
+                    $data['user_deposit'] = (float) $userDeposit;
+                }
+            }
         }
 
         if (isset($data['account_id']) && isset($data['amount'])) {
